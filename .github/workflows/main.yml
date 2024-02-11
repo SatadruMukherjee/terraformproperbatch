@@ -1,0 +1,157 @@
+name: 'Terraform'
+
+on: [push]
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+
+     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration.
+    - name: Install Terraform
+      run: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        sudo apt update && sudo apt install terraform
+
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      env:
+        AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+         cd terraform_code
+         terraform init -input=false
+
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      env:
+        AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        cd terraform_code
+        terraform plan -input=false
+
+
+      # On push to "main", build or change infrastructure according to Terraform configuration files
+      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    - name: Terraform Apply
+      env:
+        AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+         cd terraform_code
+         terraform apply -auto-approve -input=false
+     
+	 
+    - name: Capturing ECS_TASK_EXECUTION_ROLE , Job_Role & Job Name
+      env:
+        AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+         cd terraform_code
+         echo $(terraform output ECS_TASK_EXECUTION_ROLE)
+         echo "EXECUTION_ROLE_ARN=$(terraform output ECS_TASK_EXECUTION_ROLE)" >> $GITHUB_ENV
+         echo "JOB_ROLE_ARN=$(terraform output ECS_TASK_EXECUTION_ROLE)" >> $GITHUB_ENV
+		 echo $(terraform output AWS_BATCH_JOB_NAME)
+		 echo "JOB_NAME=$(terraform output AWS_BATCH_JOB_NAME)" >> $GITHUB_ENV
+		 echo $(terraform output ECR_REPO_NAME)
+		 echo "ECR_REPO_NAME=$(terraform output ECR_REPO_NAME)" >> $GITHUB_ENV
+    
+	
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+	
+	
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+
+    - name: Push-ECR
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: ${{ env.ECR_REPO_NAME }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+		
+		
+    - name: Get current JobDefinition revision
+      id: get-current-job-definition
+      shell : bash
+      run : |
+         if [[ ! $(which aws) > /dev/null ]]; then
+            apt-get update && apt-get install -y awscli
+         fi
+         REVISION=$(aws batch describe-job-definitions \
+           --job-definition-name $JOB_NAME  \
+           --status ACTIVE \
+           --query "jobDefinitions[0].revision")
+
+         echo "revision=$REVISION" >> $GITHUB_ENV
+
+
+    - name: Register new JobDefinition
+      id : register-new-job-definition
+      env : 
+          ECR_IMAGE_NAME : ${{ env.image }}
+          EXECUTION_ROLE_ARN : ${{ env.EXECUTION_ROLE_ARN }} 
+      shell : bash
+      run : |
+         echo "ECR Image Name:  $ECR_IMAGE_NAME"
+         echo "Job Role ARN: $JOB_ROLE_ARN"
+         NEW_REVISION=$(aws batch register-job-definition \
+                       --job-definition-name $JOB_NAME \
+                       --type container \
+                       --parameters '{"p": "None"}' \
+                       --retry-strategy '{"attempts": 1,"evaluateOnExit": []}' \
+                       --container-properties "{\"image\" :\"$ECR_IMAGE_NAME\", 
+                                     \"resourceRequirements\": [{\"value\": \"1.0\",\"type\": \"VCPU\"},{\"value\": \"2048\",\"type\": \"MEMORY\"}], 
+                                     \"volumes\":[], 
+                                     \"environment\": [{\"name\": \"env_var\",\"value\": \"Prod\"}], 
+                                     \"mountPoints\": [], 
+                                     \"ulimits\": [], 
+                                     \"user\": \"root\", 
+                                     \"jobRoleArn\" : $JOB_ROLE_ARN, 
+                                     \"executionRoleArn\": $EXECUTION_ROLE_ARN, 
+                                     \"command\": [\"python\",\"app.py\"], 
+                                     \"logConfiguration\": {\"logDriver\": \"awslogs\",\"options\": {},\"secretOptions\": []}, 
+                                     \"secrets\": [], 
+                                     \"networkConfiguration\": {\"assignPublicIp\": \"ENABLED\"},
+                                     \"fargatePlatformConfiguration\": {\"platformVersion\": \"LATEST\"}, 
+                                     \"runtimePlatform\": {\"operatingSystemFamily\": \"LINUX\",\"cpuArchitecture\": \"X86_64\"}}" \
+                       --platform-capabilities FARGATE \
+                       --timeout '{"attemptDurationSeconds": 2400}' \
+                       --tags '{"epi:environment": "Prod","epi:product_stream": "coding","Department": "PET","epi:supported_by": "PET","epi:owner": "satadru1998@gmail.com","epi:team": "PET","Cost_Center_Name": "MCC_Ops_Tech_Licenses","Name": "Test Job Def"}' \
+                       --propagate-tags \
+                       --query "revision" )
+    - name : Delete Previous Job Definition
+      shell: bash
+      env:
+           CURRENT_REVISION: ${{ env.revision }}
+      run: |
+          OLD_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/my-project-job-definition_tf:$CURRENT_REVISION
+          aws batch deregister-job-definition --job-definition $OLD_JOB_DEFINITION
+          PREVIOUS_TO_PREVIOUS_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/my-project-job-definition_tf:$((CURRENT_REVISION-1 ))
+          aws batch deregister-job-definition --job-definition $PREVIOUS_TO_PREVIOUS_JOB_DEFINITION

@@ -12,3 +12,11 @@ output "AWS_BATCH_JOB_NAME" {
 output "ECR_REPO_NAME" {
   value = aws_ecr_repository.repo_creation_tf.name
 }
+
+output "aws_batch_JD_vcpu" {
+  value = var.aws_batch_JD_vcpu
+}
+
+output "aws_batch_job_queue_memory" {
+  value = var.aws_batch_job_queue_memory
+}

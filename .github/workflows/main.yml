@@ -1,6 +1,5 @@
 name: "Terraform"
 
-
 on: [push]
 
 jobs:
@@ -144,7 +143,7 @@ jobs:
         env:
           CURRENT_REVISION: ${{ env.revision }}
         run: |
-          OLD_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/my-project-job-definition_tf:$CURRENT_REVISION
+          OLD_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:$CURRENT_REVISION
           aws batch deregister-job-definition --job-definition $OLD_JOB_DEFINITION
-          PREVIOUS_TO_PREVIOUS_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/my-project-job-definition_tf:$((CURRENT_REVISION-1 ))
+          PREVIOUS_TO_PREVIOUS_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:$((CURRENT_REVISION-1 ))
           aws batch deregister-job-definition --job-definition $PREVIOUS_TO_PREVIOUS_JOB_DEFINITION

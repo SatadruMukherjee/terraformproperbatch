@@ -26,6 +26,7 @@ resource "aws_batch_job_queue" "batch" {
 }
 
 resource "aws_batch_job_definition" "batch_job" {
+  depends_on = aws_iam_role.aws_ecs_task_execution_role
   name = "batch_queue_job_definition_tf"
   type = "container"
 

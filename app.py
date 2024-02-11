@@ -5,6 +5,7 @@ from datetime import datetime
 import uuid
 
 
+
 # Set your AWS credentials and region for DynamoDB
 region_name = 'us-east-1'
 ist = pytz.timezone('Asia/Kolkata')  # Indian Standard Time

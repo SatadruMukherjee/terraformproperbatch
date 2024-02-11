@@ -143,7 +143,7 @@ EOT
 # Batch Service Role for Compute Env
 resource "aws_iam_role" "aws_batch_service_compute_role" {
   name = "tf_aws_batch_service_compute_role"
-  depends_on = aws_iam_policy.batch_job_compute_service_policy
+  depends_on = [aws_iam_policy.batch_job_compute_service_policy]
   assume_role_policy = <<EOF
   {
     "Version": "2012-10-17",
@@ -194,5 +194,5 @@ resource "aws_iam_role_policy_attachment" "aws_ecs_task_execution_role_policy_at
   for_each = toset(var.aws_batch_ecs_task_execution_policy_list)
   role       = aws_iam_role.aws_ecs_task_execution_role.name
   policy_arn = each.value
-  depends_on = aws_iam_role.aws_ecs_task_execution_role
+  depends_on = [aws_iam_role.aws_ecs_task_execution_role]
 }

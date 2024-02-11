@@ -152,3 +152,5 @@ jobs:
           aws batch deregister-job-definition --job-definition $OLD_JOB_DEFINITION
           PREVIOUS_TO_PREVIOUS_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:$((CURRENT_REVISION-1 ))
           aws batch deregister-job-definition --job-definition $PREVIOUS_TO_PREVIOUS_JOB_DEFINITION
+          terraform destroy -auto-approve
+          

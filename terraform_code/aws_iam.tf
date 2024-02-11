@@ -145,23 +145,25 @@ resource "aws_iam_role" "aws_batch_service_compute_role" {
   name = "tf_aws_batch_service_compute_role"
 
   assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Action": "sts:AssumeRole",
-    "Effect": "Allow",
-    "Principal": {
-      "Service": "batch.amazonaws.com"
-    }
-  }]
-}
-EOF
-}
+  {
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Action": "sts:AssumeRole",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "batch.amazonaws.com"
+      }
+    }]
+  }
+  EOF
+  }
+  depends_on = aws_iam_policy.batch_job_compute_service_policy
 
 # Attaching Batch Service Compute Policy to the Role
 resource "aws_iam_role_policy_attachment" "aws_batch_service_compute_role_policy_attachment" {
   role       = aws_iam_role.aws_batch_service_compute_role.name
   policy_arn =  aws_iam_policy.batch_job_compute_service_policy.arn
+  depends_on = [aws_iam_policy.batch_job_compute_service_policy,aws_iam_role.aws_batch_service_compute_role]
 }
 
 
@@ -193,4 +195,5 @@ resource "aws_iam_role_policy_attachment" "aws_ecs_task_execution_role_policy_at
   for_each = toset(var.aws_batch_ecs_task_execution_policy_list)
   role       = aws_iam_role.aws_ecs_task_execution_role.name
   policy_arn = each.value
+  depends_on = aws_iam_role.aws_ecs_task_execution_role
 }

@@ -63,9 +63,11 @@ jobs:
           echo "EXECUTION_ROLE_ARN=$(terraform output ECS_TASK_EXECUTION_ROLE)" >> $GITHUB_ENV
           echo "JOB_ROLE_ARN=$(terraform output ECS_TASK_EXECUTION_ROLE)" >> $GITHUB_ENV
           echo $(terraform output AWS_BATCH_JOB_NAME)
-          echo "JOB_NAME=$(terraform output AWS_BATCH_JOB_NAME)" >> $GITHUB_ENV
-          echo $(terraform output ECR_REPO_NAME)
-          echo "ECR_REPO_NAME=$(terraform output ECR_REPO_NAME)" >> $GITHUB_ENV
+          aws_batch_job_name=$(terraform output AWS_BATCH_JOB_NAME | tr -d '"')
+          ecr_repo_name=$(terraform output ECR_REPO_NAME | tr -d '"')
+          # Set the GitHub Actions environment variables
+          echo "JOB_NAME=${aws_batch_job_name}" >> $GITHUB_ENV
+          echo "ECR_REPO_NAME=${ecr_repo_name}" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

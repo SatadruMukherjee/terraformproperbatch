@@ -1,6 +1,6 @@
 name: "Terraform"
 
-on: [push]
+#on: [push]
 
 jobs:
   terraform:
@@ -68,6 +68,11 @@ jobs:
           # Set the GitHub Actions environment variables
           echo "JOB_NAME=${aws_batch_job_name}" >> $GITHUB_ENV
           echo "ECR_REPO_NAME=${ecr_repo_name}" >> $GITHUB_ENV
+          aws_batch_JD_vcpu_processed=$(terraform output aws_batch_JD_vcpu | tr -d '"')
+          echo "AWS_BATCH_JD_VCPU=${aws_batch_JD_vcpu_processed}" >> $GITHUB_ENV
+          aws_batch_job_queue_memory_processed=$(terraform output aws_batch_job_queue_memory | tr -d '"')
+          echo "AWS_BATCH_JD_MEMOREY=${aws_batch_job_queue_memory_processed}" >> $GITHUB_ENV
+          
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -119,7 +124,7 @@ jobs:
                         --parameters '{"p": "None"}' \
                         --retry-strategy '{"attempts": 1,"evaluateOnExit": []}' \
                         --container-properties "{\"image\" :\"$ECR_IMAGE_NAME\", 
-                                      \"resourceRequirements\": [{\"value\": \"1.0\",\"type\": \"VCPU\"},{\"value\": \"2048\",\"type\": \"MEMORY\"}], 
+                                      \"resourceRequirements\": [{\"value\": \"$AWS_BATCH_JD_VCPU\",\"type\": \"VCPU\"},{\"value\": \"$AWS_BATCH_JD_MEMOREY\",\"type\": \"MEMORY\"}], 
                                       \"volumes\":[], 
                                       \"environment\": [{\"name\": \"env_var\",\"value\": \"Prod\"}], 
                                       \"mountPoints\": [], 

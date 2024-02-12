@@ -72,7 +72,7 @@ jobs:
           echo "AWS_BATCH_JD_VCPU=${aws_batch_JD_vcpu_processed}" >> $GITHUB_ENV
           aws_batch_JD_memory_processed=$(terraform output aws_batch_JD_memory | tr -d '"')
           echo "AWS_BATCH_JD_MEMOREY=${aws_batch_JD_memory_processed}" >> $GITHUB_ENV
-          eventbridge_rule_name_processed=$(terraform output eventbridge_rule_name | tr -d '"')
+          eventbridge_rule_name_processed=$(terraform output EventBridge_Rule_Name | tr -d '"')
           echo "EventBridge_Rule_Name=${eventbridge_rule_name_processed}" >> $GITHUB_ENV
           Batch_Job_Queue_ARN_processed=$(terraform output Batch_Job_Queue_ARN | tr -d '"')
           echo "JOB_QUEUE_ARN=${Batch_Job_Queue_ARN_processed}" >> $GITHUB_ENV
@@ -154,12 +154,9 @@ jobs:
 
       - name : Update CloudWatch Events Rule [For Job Scheduling]
         shell : bash
-        env:
-          NEW_REVISION: ${{ env.new_revision }}
         run : |
-            NEW_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:$NEW_REVISION
+            NEW_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:${{ env.new_revision }}
             aws events remove-targets --rule  ${{ env.EventBridge_Rule_Name }}
-            New_Job_ARN=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:$NEW_REVISION
             aws events put-targets ${{ env.EventBridge_Rule_Name }} \
               --targets "[ {\" Arn \" : \" ${{ env.JOB_QUEUE_ARN }} \" , 
                              \" RoleArn \" : \" ${{ env.Scheduler_ARN }} \" , 

@@ -20,3 +20,19 @@ output "aws_batch_JD_vcpu" {
 output "aws_batch_JD_memory" {
   value = var.aws_batch_JD_memory
 }
+
+
+output "EventBridge_Rule_Name" {
+  value = var.eventbridge_rule_name
+}
+
+
+
+output "Batch_Job_Queue_ARN" {
+  value = aws_batch_job_queue.batch_queue.arn
+}
+
+
+output "Scheduler_Batch_Role_ARN" {
+  value = aws_iam_role.scheduler-batch-role.arn
+}

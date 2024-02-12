@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "repo_creation_tf" {
-  name                 = "ecr_repo_tf"
+  name                 = var.aws_ecr_repo_name
   image_tag_mutability = "MUTABLE"
   force_delete = true
   image_scanning_configuration {

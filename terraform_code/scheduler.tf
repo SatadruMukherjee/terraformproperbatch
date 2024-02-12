@@ -1,7 +1,8 @@
 resource "aws_scheduler_schedule" "cron" {
-  name        = "Batch_Task_Scheduler"
+  name        = var.eventbridge_rule_name
   group_name  = "default"
-  depends_on = [aws_iam_policy.scheduler_batch_policy,aws_iam_role.scheduler-batch-role,aws_batch_job_definition.batch_job,aws_batch_job_queue.batch_queue]
+  depends_on = [aws_iam_policy.scheduler_batch_policy,aws_iam_role.scheduler-batch-role,aws_batch_job_definition.batch_job,
+               aws_batch_job_queue.batch_queue]
   flexible_time_window {
     mode = "OFF"
   }
@@ -17,7 +18,7 @@ resource "aws_scheduler_schedule" "cron" {
     role_arn = aws_iam_role.scheduler-batch-role.arn
   
     input = jsonencode({
-        "JobName": "scheduled-batch-job",
+        "JobName": "${aws_batch_job_definition.batch_job.name}",
         "JobDefinition": "${aws_batch_job_definition.batch_job.arn}",
         "JobQueue": "${aws_batch_job_queue.batch_queue.arn}"
     })

@@ -1,6 +1,6 @@
 # Batch Service Policy Creation for Compute Env
 resource "aws_iam_policy" "batch_job_compute_service_policy" {
-  name        = "batch_service_role_for_compute"
+  name        = var.batch_job_compute_service_policy_name
   description = "AWS Batch Service role to launch Compute Env"
 
   policy = <<EOT
@@ -142,7 +142,7 @@ EOT
 
 # Batch Service Role for Compute Env
 resource "aws_iam_role" "aws_batch_service_compute_role" {
-  name = "tf_aws_batch_service_compute_role"
+  name = var.batch_job_compute_service_role_name
   depends_on = [aws_iam_policy.batch_job_compute_service_policy]
   assume_role_policy = <<EOF
   {
@@ -170,7 +170,7 @@ resource "aws_iam_role_policy_attachment" "aws_batch_service_compute_role_policy
 
 # ECS Task Execution Role to access Cloudwatch & ECR
 resource "aws_iam_role" "aws_ecs_task_execution_role" {
-  name = "tf_ecs_task_execution_role"
+  name = var.aws_ecs_task_execution_role_name
 
   assume_role_policy = <<EOF
 {
@@ -201,7 +201,7 @@ resource "aws_iam_role_policy_attachment" "aws_ecs_task_execution_role_policy_at
 
 
 resource "aws_iam_policy" "scheduler_batch_policy" {
-  name = "scheduler_batch_policy"
+  name = var.scheduler_policy_name
 
     policy = jsonencode({
     "Version": "2012-10-17",
@@ -232,7 +232,7 @@ resource "aws_iam_policy" "scheduler_batch_policy" {
 }
 
 resource "aws_iam_role" "scheduler-batch-role" {
-  name = "scheduler-batch-role"
+  name = var.scheduler_role_name
   managed_policy_arns = [aws_iam_policy.scheduler_batch_policy.arn]
   depends_on = [aws_iam_policy.scheduler_batch_policy]
   assume_role_policy = jsonencode({

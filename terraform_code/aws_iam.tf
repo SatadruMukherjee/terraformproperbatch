@@ -143,7 +143,7 @@ resource "aws_iam_role" "aws_batch_service_compute_role" {
   name = var.batch_job_compute_service_role_name
   depends_on = [aws_iam_policy.batch_job_compute_service_policy]
   assume_role_policy = <<EOF
-  {
+{
     "Version": "2012-10-17",
     "Statement": [{
       "Action": "sts:AssumeRole",
@@ -152,9 +152,9 @@ resource "aws_iam_role" "aws_batch_service_compute_role" {
         "Service": "batch.amazonaws.com"
       }
     }]
-  }
+}
 EOF
-  }
+}
 
 # Attaching Batch Service Compute Policy to the Role
 resource "aws_iam_role_policy_attachment" "aws_batch_service_compute_role_policy_attachment" {

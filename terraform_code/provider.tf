@@ -8,12 +8,11 @@ terraform {
   backend "s3" {
     bucket = "demoyttesttrail"
     key    = "test123/terraform/terraform.tfstate"
-    region = "us-east-1"
   }
   required_version = "~> 1.0"
 }
 
 
 provider "aws" {
-  region     = "us-east-1"
+  region     = var.AWS_DEFAULT_REGION
 }

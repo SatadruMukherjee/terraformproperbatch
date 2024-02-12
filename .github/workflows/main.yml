@@ -12,6 +12,24 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      AWS_ACCESS_KEY_ID : ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY : ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      AWS_DEFAULT_REGION : ${{secrets.AWS_DEFAULT_REGION}}
+      TF_VAR_AWS_DEFAULT_REGION : ${{secrets.AWS_DEFAULT_REGION}}
+      TF_VAR_batch_compute_env_name : ${{secrets.batch_compute_env_name}}
+      TF_VAR_aws_batch_ecs_task_execution_policy_list : ${{secrets.aws_batch_ecs_task_execution_policy_list}}
+      TF_VAR_aws_batch_compute_env_max_vcpu : ${{secrets.aws_batch_compute_env_max_vcpu}}
+      TF_VAR_aws_batch_compute_env_security_groups : ${{secrets.aws_batch_compute_env_security_groups}}
+      TF_VAR_aws_batch_compute_env_subnet_groups : ${{secrets.aws_batch_compute_env_subnet_groups}}
+      TF_VAR_aws_batch_job_queue_name : ${{secrets.aws_batch_job_queue_name}}
+      TF_VAR_aws_batch_job_queue_priority: ${{secrets.aws_batch_job_queue_priority}}
+      TF_VAR_aws_batch_job_name : ${{secrets.aws_batch_job_name}}
+      TF_VAR_aws_batch_JD_vcpu : ${{secrets.aws_batch_JD_vcpu}}
+      TF_VAR_aws_batch_JD_memory: ${{secrets.aws_batch_JD_memory}}
+      TF_VAR_aws_ecr_repo_name: ${{secrets.aws_ecr_repo_name}}
+      TF_VAR_batch_job_schedule_expression: ${{secrets.batch_job_schedule_expression}}
+      TF_VAR_eventbridge_rule_name: ${{secrets.eventbridge_rule_name}}
 
     steps:
       # Checkout the repository to the GitHub Actions runner
@@ -27,18 +45,12 @@ jobs:
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           cd terraform_code
           terraform init -input=false
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           cd terraform_code
           terraform plan -input=false
@@ -46,18 +58,12 @@ jobs:
         # On push to "main", build or change infrastructure according to Terraform configuration files
         # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
       - name: Terraform Apply
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           cd terraform_code
           terraform apply -auto-approve -input=false
 
         #Capturing the output from TF
       - name: Capturing ECS_TASK_EXECUTION_ROLE , Job_Role & Job Name
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           cd terraform_code
           echo $(terraform output ECS_TASK_EXECUTION_ROLE)
@@ -76,10 +82,6 @@ jobs:
         #Configure AWS Credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -150,9 +152,9 @@ jobs:
         env:
           CURRENT_REVISION: ${{ env.revision }}
         run: |
-          OLD_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:$CURRENT_REVISION
+          OLD_JOB_DEFINITION=arn:aws:batch:$AWS_DEFAULT_REGION:825865577047:job-definition/$JOB_NAME:$CURRENT_REVISION
           aws batch deregister-job-definition --job-definition $OLD_JOB_DEFINITION
-          PREVIOUS_TO_PREVIOUS_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:$((CURRENT_REVISION-1 ))
+          PREVIOUS_TO_PREVIOUS_JOB_DEFINITION=arn:aws:batch:$AWS_DEFAULT_REGION:825865577047:job-definition/$JOB_NAME:$((CURRENT_REVISION-1 ))
           aws batch deregister-job-definition --job-definition $PREVIOUS_TO_PREVIOUS_JOB_DEFINITION
           : # cd terraform_code
           : # terraform destroy -auto-approve

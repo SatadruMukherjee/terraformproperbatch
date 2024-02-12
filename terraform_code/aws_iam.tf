@@ -153,7 +153,7 @@ resource "aws_iam_role" "aws_batch_service_compute_role" {
       }
     }]
   }
-  EOF
+EOF
   }
 
 # Attaching Batch Service Compute Policy to the Role

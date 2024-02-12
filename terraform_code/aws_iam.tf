@@ -138,8 +138,6 @@ resource "aws_iam_policy" "batch_job_compute_service_policy" {
 EOT
 }
 
-
-
 # Batch Service Role for Compute Env
 resource "aws_iam_role" "aws_batch_service_compute_role" {
   name = var.batch_job_compute_service_role_name

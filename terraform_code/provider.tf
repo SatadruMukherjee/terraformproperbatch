@@ -7,7 +7,7 @@ terraform {
   }
   backend "s3" {
     bucket = "demoyttesttrail"
-    key    = "test123/terraform/terraform.tfstate",
+    key    = "test123/terraform/terraform.tfstate"
     region     = var.AWS_DEFAULT_REGION
   }
   required_version = "~> 1.0"

@@ -48,7 +48,7 @@ jobs:
       - name: Terraform Init
         run: |
           cd terraform_code
-          terraform init -input=false
+          terraform init -input=false -force-copy -backend-config="bucket=demoyttesttrail" -backend-config="key=test123/terraform/terraform.tfstate" -backend-config="region=us-east-1"
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan

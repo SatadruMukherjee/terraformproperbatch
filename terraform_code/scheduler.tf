@@ -10,16 +10,16 @@ resource "aws_scheduler_schedule" "cron" {
   #schedule_expression = "cron(*/30 * * * ? *)" # run every 30 minutes
   schedule_expression = var.batch_job_schedule_expression
   schedule_expression_timezone = "Asia/Calcutta" # Default is UTC
-  state  = "DISABLED"
+  #state  = "DISABLED"
   description = "submitJob Batch event"
 
   target {
     arn = "arn:aws:scheduler:::aws-sdk:batch:submitJob"
     role_arn = aws_iam_role.scheduler-batch-role.arn
-  
+    
     input = jsonencode({
         "JobName": "${aws_batch_job_definition.batch_job.name}",
-        "JobDefinition": "${aws_batch_job_definition.batch_job.arn}",
+        "JobDefinition": "${aws_batch_job_definition.batch_job.name}",
         "JobQueue": "${aws_batch_job_queue.batch_queue.arn}"
     })
   }

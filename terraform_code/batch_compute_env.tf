@@ -11,11 +11,11 @@ resource "aws_batch_compute_environment" "batch_compute" {
   service_role = aws_iam_role.aws_batch_service_compute_role.arn
   type         = "MANAGED"
   depends_on = [
-    aws_iam_role.aws_batch_service_compute_role
+    aws_iam_policy.batch_job_compute_service_policy,aws_iam_role.aws_batch_service_compute_role
   ]
 }
 
-resource "aws_batch_job_queue" "batch" {
+resource "aws_batch_job_queue" "batch_queue" {
   name     = "batch_queue_tf"
   state    = "ENABLED"
   priority = var.aws_batch_job_queue_priority
@@ -35,8 +35,8 @@ resource "aws_batch_job_definition" "batch_job" {
   ]
 
   container_properties = jsonencode({
-    command    = ["echo", "test"]
-    image      = "825865577047.dkr.ecr.us-east-1.amazonaws.com/demotest123:dc8060a4e273b130bdc67e4c0c867e78aae8dfef"
+    command    = ["echo","hello world"]
+    image      = "public.ecr.aws/amazonlinux/amazonlinux:latest"
     jobRoleArn = aws_iam_role.aws_ecs_task_execution_role.arn
 
     fargatePlatformConfiguration = {
@@ -54,7 +54,7 @@ resource "aws_batch_job_definition" "batch_job" {
       },
       {
         type  = "MEMORY"
-        value = var.aws_batch_job_queue_memory
+        value = var.aws_batch_JD_memory
       }
     ]
 

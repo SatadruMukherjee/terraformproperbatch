@@ -39,6 +39,10 @@ variable aws_batch_JD_vcpu {
 
 
 
-variable aws_batch_job_queue_memory {
+variable aws_batch_JD_memory {
   default = "512"
+}
+
+variable batch_job_schedule_expression {
+  default = "rate(2 minutes)"
 }

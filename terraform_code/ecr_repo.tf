@@ -9,7 +9,7 @@ resource "aws_ecr_repository" "repo_creation_tf" {
 
 resource "aws_ecr_lifecycle_policy" "ecr_lifecycle_ploicy_tf" {
   repository = aws_ecr_repository.repo_creation_tf.name
-
+  depends_on = [aws_ecr_repository.repo_creation_tf]
   policy = <<EOF
 {
   "rules": [

@@ -196,3 +196,56 @@ resource "aws_iam_role_policy_attachment" "aws_ecs_task_execution_role_policy_at
   policy_arn = each.value
   depends_on = [aws_iam_role.aws_ecs_task_execution_role]
 }
+
+
+
+
+resource "aws_iam_policy" "scheduler_batch_policy" {
+  name = "scheduler_batch_policy"
+
+    policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "batch:SubmitJob",
+                "batch:DescribeJobs",
+                "batch:TerminateJob"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "events:PutTargets",
+                "events:PutRule",
+                "events:DescribeRule"
+            ],
+            "Resource": [
+                "*"
+            ],
+            "Effect": "Allow"
+        }
+       ]
+      }
+    )
+}
+
+resource "aws_iam_role" "scheduler-batch-role" {
+  name = "scheduler-batch-role"
+  managed_policy_arns = [aws_iam_policy.scheduler_batch_policy.arn]
+  depends_on = [aws_iam_policy.scheduler_batch_policy]
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+      },
+    ]
+  })
+}

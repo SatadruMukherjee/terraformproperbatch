@@ -17,6 +17,6 @@ output "aws_batch_JD_vcpu" {
   value = var.aws_batch_JD_vcpu
 }
 
-output "aws_batch_job_queue_memory" {
-  value = var.aws_batch_job_queue_memory
+output "aws_batch_JD_memory" {
+  value = var.aws_batch_JD_memory
 }

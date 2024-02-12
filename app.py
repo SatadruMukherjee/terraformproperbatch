@@ -29,7 +29,7 @@ def main():
   data = response.json()
 
   data_to_ingest={"amount":{"S":data["data"]["amount"]},"base":{"S":data["data"]["base"]},"currency":{"S":data["data"]["currency"]},"timestamp":{"S":current_time},"uuid":{"S":str(uuid.uuid4())},
-                 "temp_uuid":{"S":str(uuid.uuid4())},"temp_uuid_1":{"S":str(uuid.uuid4())}}
+                 "temp_uuid":{"S":str(uuid.uuid4())},"temp_uuid_1":{"S":str(uuid.uuid4())},"temp_uuid_2":{"S":str(uuid.uuid4())}}
   put_item_to_dynamodb(data_to_ingest)
   print(f'Item {data_to_ingest} added to DynamoDB table {table_name}.')
 

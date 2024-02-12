@@ -13,33 +13,33 @@ variable batch_job_compute_service_policy_name {
 
 
 variable batch_job_compute_service_role_name {
-  #default="tf_aws_batch_service_compute_role"
+  default="tf_aws_batch_service_compute_role"
   type        = string
   description = "AWS Batch Job Compute Service Role"
 }
 
 variable aws_ecs_task_execution_role_name {
-  #default="tf_ecs_task_execution_role"
+  default="tf_ecs_task_execution_role"
   type        = string
   description = "AWS ECS Task Exection Role"
 }
 
 
 variable scheduler_policy_name {
-  #default="scheduler_batch_policy"
+  default="scheduler_batch_policy"
   type        = string
   description = "AWS EventBridge Scheduler Policy"
 }
 
 
 variable scheduler_role_name {
-  #default="scheduler-batch-role"
+  default="scheduler-batch-role"
   type        = string
   description = "AWS EventBridge Scheduler Role"
 }
 
 variable batch_compute_env_name {
-  #default="batch_compute_env_tf"
+  default="batch_compute_env_tf"
   type        = string
   description = "AWS Batch Compute Env"
 }

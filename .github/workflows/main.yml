@@ -6,7 +6,7 @@ jobs:
   terraform:
     name: "Terraform"
     runs-on: ubuntu-latest
-    environment: production
+    #environment: production
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -16,20 +16,20 @@ jobs:
       AWS_ACCESS_KEY_ID : ${{secrets.AWS_ACCESS_KEY_ID}}
       AWS_SECRET_ACCESS_KEY : ${{secrets.AWS_SECRET_ACCESS_KEY}}
       AWS_DEFAULT_REGION : ${{secrets.AWS_DEFAULT_REGION}}
-      TF_VAR_AWS_DEFAULT_REGION : ${{secrets.AWS_DEFAULT_REGION}}
-      TF_VAR_batch_compute_env_name : ${{secrets.batch_compute_env_name}}
-      TF_VAR_aws_batch_ecs_task_execution_policy_list : ${{secrets.aws_batch_ecs_task_execution_policy_list}}
-      TF_VAR_aws_batch_compute_env_max_vcpu : ${{secrets.aws_batch_compute_env_max_vcpu}}
-      TF_VAR_aws_batch_compute_env_security_groups : ${{secrets.aws_batch_compute_env_security_groups}}
-      TF_VAR_aws_batch_compute_env_subnet_groups : ${{secrets.aws_batch_compute_env_subnet_groups}}
-      TF_VAR_aws_batch_job_queue_name : ${{secrets.aws_batch_job_queue_name}}
-      TF_VAR_aws_batch_job_queue_priority: ${{secrets.aws_batch_job_queue_priority}}
-      TF_VAR_aws_batch_job_name : ${{secrets.aws_batch_job_name}}
-      TF_VAR_aws_batch_JD_vcpu : ${{secrets.aws_batch_JD_vcpu}}
-      TF_VAR_aws_batch_JD_memory: ${{secrets.aws_batch_JD_memory}}
-      TF_VAR_aws_ecr_repo_name: ${{secrets.aws_ecr_repo_name}}
-      TF_VAR_batch_job_schedule_expression: ${{secrets.batch_job_schedule_expression}}
-      TF_VAR_eventbridge_rule_name: ${{secrets.eventbridge_rule_name}}
+      TF_VAR_AWS_DEFAULT_REGION : ${{secrets.TF_VAR_AWS_DEFAULT_REGION}}
+      TF_VAR_batch_compute_env_name : ${{secrets.TF_VAR_BATCH_COMPUTE_ENV_NAME}}
+      TF_VAR_aws_batch_ecs_task_execution_policy_list : ${{secrets.TF_VAR_AWS_BATCH_ECS_TASK_EXECUTION_POLICY_LIST}}
+      TF_VAR_aws_batch_compute_env_max_vcpu : ${{secrets.TF_VAR_AWS_BATCH_COMPUTE_ENV_MAX_VCPU}}
+      TF_VAR_aws_batch_compute_env_security_groups : ${{secrets.TF_VAR_AWS_BATCH_COMPUTE_ENV_SECURITY_GROUPS}}
+      TF_VAR_aws_batch_compute_env_subnet_groups : ${{secrets.TF_VAR_AWS_BATCH_COMPUTE_ENV_SUBNET_GROUPS}}
+      TF_VAR_aws_batch_job_queue_name : ${{secrets.TF_VAR_AWS_BATCH_JOB_QUEUE_NAME}}
+      TF_VAR_aws_batch_job_queue_priority: ${{secrets.TF_VAR_AWS_BATCH_JOB_QUEUE_PRIORITY}}
+      TF_VAR_aws_batch_job_name : ${{secrets.TF_VAR_AWS_BATCH_JOB_NAME}}
+      TF_VAR_aws_batch_JD_vcpu : ${{secrets.TF_VAR_AWS_BATCH_JD_VCPU}}
+      TF_VAR_aws_batch_JD_memory: ${{secrets.TF_VAR_AWS_BATCH_JD_MEMORY}}
+      TF_VAR_aws_ecr_repo_name: ${{secrets.TF_VAR_AWS_ECR_REPO_NAME}}
+      TF_VAR_batch_job_schedule_expression: ${{secrets.TF_VAR_BATCH_JOB_SCHEDULE_EXPRESSION}}
+      TF_VAR_eventbridge_rule_name: ${{secrets.TF_VAR_EVENTBRIDGE_RULE_NAME}}
 
     steps:
       # Checkout the repository to the GitHub Actions runner

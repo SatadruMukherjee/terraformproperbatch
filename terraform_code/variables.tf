@@ -5,40 +5,40 @@ variable AWS_DEFAULT_REGION {
 }
 
 
-variable BATCH_JOB_COMPUTE_SERVICE_POLICY_NAME {
+variable batch_job_compute_service_policy_name {
   default="batch_service_policy_for_compute"
   type        = string
   description = "AWS Batch Job Compute Service Policy"
 }
 
 
-variable BATCH_JOB_COMPUTE_SERVICE_ROLE_NAME {
-  default="tf_aws_batch_service_compute_role"
+variable batch_job_compute_service_role_name {
+  #default="tf_aws_batch_service_compute_role"
   type        = string
   description = "AWS Batch Job Compute Service Role"
 }
 
-variable AWS_ECS_TASK_EXECUTION_ROLE_NAME {
-  default="tf_ecs_task_execution_role"
+variable aws_ecs_task_execution_role_name {
+  #default="tf_ecs_task_execution_role"
   type        = string
   description = "AWS ECS Task Exection Role"
 }
 
 
-variable SCHEDULER_POLICY_NAME {
-  default="scheduler_batch_policy"
+variable scheduler_policy_name {
+  #default="scheduler_batch_policy"
   type        = string
   description = "AWS EventBridge Scheduler Policy"
 }
 
 
-variable SCHEDULER_ROLE_NAME {
-  default="scheduler-batch-role"
+variable scheduler_role_name {
+  #default="scheduler-batch-role"
   type        = string
   description = "AWS EventBridge Scheduler Role"
 }
 
-variable BATCH_COMPUTE_ENV_NAME {
+variable batch_compute_env_name {
   #default="batch_compute_env_tf"
   type        = string
   description = "AWS Batch Compute Env"
@@ -47,7 +47,7 @@ variable BATCH_COMPUTE_ENV_NAME {
 
 
 
-variable AWS_BATCH_ECS_TASK_EXECUTION_POLICY_LIST {
+variable aws_batch_ecs_task_execution_policy_list {
   type = list
   #default = ["arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy","arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"]
   description = "AWS Batch ECS Task Execution Policy List"
@@ -55,14 +55,14 @@ variable AWS_BATCH_ECS_TASK_EXECUTION_POLICY_LIST {
 
 
 
-variable AWS_BATCH_COMPUTE_ENV_MAX_VCPU {
+variable aws_batch_compute_env_max_vcpu {
   #default = 1
   type        = string
   description = "AWS Batch Compute Env Max VCPU"
 }
 
 
-variable AWS_BATCH_COMPUTE_ENV_SECURITY_GROUPS {
+variable aws_batch_compute_env_security_groups {
   #default = ["sg-0a2a8f58b5a8143ad"]
   type        = list(string)
   description = "AWS Batch Compute Env Security Group"
@@ -70,7 +70,7 @@ variable AWS_BATCH_COMPUTE_ENV_SECURITY_GROUPS {
 
 
 
-variable AWS_BATCH_COMPUTE_ENV_SUBNET_GROUPS {
+variable aws_batch_compute_env_subnet_groups {
   # default = ["subnet-04d5b3850b2a96a34",
   #           "subnet-06c13760e12be3492",
   #           "subnet-095831b3f93aaf1d2",
@@ -82,7 +82,7 @@ variable AWS_BATCH_COMPUTE_ENV_SUBNET_GROUPS {
 }
 
 
-variable AWS_BATCH_JOB_QUEUE_NAME {
+variable aws_batch_job_queue_name {
   #default = "batch_queue_tf"
   type        = string
   description = "AWS Batch Queue"
@@ -91,21 +91,21 @@ variable AWS_BATCH_JOB_QUEUE_NAME {
 
 
 
-variable AWS_BATCH_JOB_QUEUE_PRIORITY {
+variable aws_batch_job_queue_priority {
   #default = "0"
   type        = string
   description = "AWS Batch Queue Priority"
 }
 
 
-variable AWS_BATCH_JOB_NAME {
+variable aws_batch_job_name {
   #default =  "batch_queue_job_definition_tf"
   type        = string
   description = "AWS Batch Job Name"
 }
 
 
-variable AWS_BATCH_JD_VCPU {
+variable aws_batch_JD_vcpu {
   #default = "0.25"
   type        = string
   description = "VCPU for AWS Batch Job Description"
@@ -113,13 +113,13 @@ variable AWS_BATCH_JD_VCPU {
 
 
 
-variable AWS_BATCH_JD_MEMORY {
+variable aws_batch_JD_memory {
   #default = "512"
   type        = string
   description = "Memory for AWS Batch Job Description"
 }
 
-variable AWS_ECR_REPO_NAME {
+variable aws_ecr_repo_name {
   #default = "ecr_repo_tf"
   type        = string
   description = "AWS ECR Repo Name"
@@ -128,14 +128,14 @@ variable AWS_ECR_REPO_NAME {
 
 
 
-variable BATCH_JOB_SCHEDULE_EXPRESSION {
+variable batch_job_schedule_expression {
   #default = "rate(2 minutes)"
   type        = string
   description = "AWS Batch Schedule Expression"
 }
 
 
-variable EVENTBRIDGE_RULE_NAME {
+variable eventbridge_rule_name {
   #default = "Batch_Task_Scheduler"
   type        = string
   description = "AWS Batch Eventbridge Rule Name"

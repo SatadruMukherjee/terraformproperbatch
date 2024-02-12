@@ -36,3 +36,8 @@ output "Batch_Job_Queue_ARN" {
 output "Scheduler_Batch_Role_ARN" {
   value = aws_iam_role.scheduler-batch-role.arn
 }
+
+
+output "Scheduler_Batch_target_id" {
+  value = aws_scheduler_schedule.cron.id
+}

@@ -78,6 +78,8 @@ jobs:
           echo "JOB_QUEUE_ARN=${Batch_Job_Queue_ARN_processed}" >> $GITHUB_ENV
           Scheduler_Batch_Role_ARN_processed=$(terraform output Scheduler_Batch_Role_ARN | tr -d '"')
           echo "Scheduler_ARN=${Scheduler_Batch_Role_ARN_processed}" >> $GITHUB_ENV
+          Scheduler_Batch_target_id_processed=$(terraform output Scheduler_Batch_target_id | tr -d '"')
+          echo "Scheduler_target_id=${Scheduler_Batch_target_id_processed}" >> $GITHUB_ENV
           
         #Configure AWS Credentials
       - name: Configure AWS credentials
@@ -156,9 +158,10 @@ jobs:
         shell : bash
         run : |
             NEW_JOB_DEFINITION=arn:aws:batch:us-east-1:825865577047:job-definition/$JOB_NAME:${{ env.new_revision }}
-            aws events remove-targets --rule  ${{ env.EventBridge_Rule_Name }}
+            aws events remove-targets --rule  ${{ env.EventBridge_Rule_Name }} --ids ${{ env.Scheduler_target_id }}
             aws events put-targets ${{ env.EventBridge_Rule_Name }} \
-              --targets "[ {\" Arn \" : \" ${{ env.JOB_QUEUE_ARN }} \" , 
+              --targets "[ {\"Id\": \"${{ env.Scheduler_target_id }}\",,
+                            \" Arn \" : \" ${{ env.JOB_QUEUE_ARN }} \" , 
                              \" RoleArn \" : \" ${{ env.Scheduler_ARN }} \" , 
                              \" BatchParameters \" : { \" JobDefinition \" : \" $NEW_JOB_DEFINITION \" , 
                                                         \" JobName \" : \" $JOB_NAME \"}

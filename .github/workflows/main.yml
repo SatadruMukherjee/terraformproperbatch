@@ -17,7 +17,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY : ${{secrets.AWS_SECRET_ACCESS_KEY}}
       AWS_DEFAULT_REGION : ${{secrets.AWS_DEFAULT_REGION}}
       TF_VAR_AWS_DEFAULT_REGION : ${{secrets.TF_VAR_AWS_DEFAULT_REGION}}
-      TF_VAR_EPICC_FOLDER_KEY : ${{secrets.EPICC_FOLDER_KEY}}
+      TF_VAR_s3_FOLDER_KEY : ${{secrets.TF_s3_FOLDER_KEY}}
       TF_VAR_batch_compute_env_name : ${{secrets.TF_VAR_BATCH_COMPUTE_ENV_NAME}}
       TF_VAR_aws_batch_ecs_task_execution_policy_list : ${{secrets.TF_VAR_AWS_BATCH_ECS_TASK_EXECUTION_POLICY_LIST}}
       TF_VAR_aws_batch_compute_env_max_vcpu : ${{secrets.TF_VAR_AWS_BATCH_COMPUTE_ENV_MAX_VCPU}}
@@ -50,7 +50,7 @@ jobs:
       - name: Terraform Init
         run: |
           cd terraform_code
-          terraform init -input=false -force-copy -backend-config="bucket=demoyttesttrail" -backend-config="key=$TF_VAR_EPICC_FOLDER_KEY/tf-state/${GITHUB_REF_NAME}/terraform.tfstate" -backend-config="region=$S3_BUCKET_REGION"
+          terraform init -input=false -force-copy -backend-config="bucket=demoyttesttrail" -backend-config="key=$TF_VAR_s3_FOLDER_KEY/tf-state/${GITHUB_REF_NAME}/terraform.tfstate" -backend-config="region=$S3_BUCKET_REGION"
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan

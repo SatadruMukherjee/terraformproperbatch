@@ -1,10 +1,6 @@
 name: Environment Variable Configuration
 
-on:
-  push:
-    branches:
-      - master
-      - prod
+on: [push]
 
 jobs:
   configure-environment:

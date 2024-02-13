@@ -1,170 +1,18 @@
-name: "Terraform"
+name: Environment Variable Configuration
 
-on: [push]
-
+on:
+  push:
+    branches:
+      - master
+      - prod
 
 jobs:
-  terraform:
-    name: "Terraform"
+  configure-environment:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
 
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-    defaults:
-      run:
-        shell: bash
-    env:
-      AWS_ACCESS_KEY_ID : ${{secrets.AWS_ACCESS_KEY_ID}}
-      AWS_SECRET_ACCESS_KEY : ${{secrets.AWS_SECRET_ACCESS_KEY}}
-      AWS_DEFAULT_REGION : ${{secrets.AWS_DEFAULT_REGION}}
-      TF_VAR_AWS_DEFAULT_REGION : ${{secrets.TF_VAR_AWS_DEFAULT_REGION}}
-      TF_VAR_EPICC_FOLDER_KEY : ${{secrets.EPICC_FOLDER_KEY}}
-      TF_VAR_batch_compute_env_name : ${{secrets.TF_VAR_BATCH_COMPUTE_ENV_NAME}}
-      TF_VAR_aws_batch_ecs_task_execution_policy_list : ${{secrets.TF_VAR_AWS_BATCH_ECS_TASK_EXECUTION_POLICY_LIST}}
-      TF_VAR_aws_batch_compute_env_max_vcpu : ${{secrets.TF_VAR_AWS_BATCH_COMPUTE_ENV_MAX_VCPU}}
-      TF_VAR_aws_batch_compute_env_security_groups : ${{secrets.TF_VAR_AWS_BATCH_COMPUTE_ENV_SECURITY_GROUPS}}
-      TF_VAR_aws_batch_compute_env_subnet_groups : ${{secrets.TF_VAR_AWS_BATCH_COMPUTE_ENV_SUBNET_GROUPS}}
-      TF_VAR_aws_batch_job_queue_name : ${{secrets.TF_VAR_AWS_BATCH_JOB_QUEUE_NAME}}
-      TF_VAR_aws_batch_job_queue_priority: ${{secrets.TF_VAR_AWS_BATCH_JOB_QUEUE_PRIORITY}}
-      TF_VAR_aws_batch_job_name : ${{secrets.TF_VAR_AWS_BATCH_JOB_NAME}}
-      TF_VAR_aws_batch_JD_vcpu : ${{secrets.TF_VAR_AWS_BATCH_JD_VCPU}}
-      TF_VAR_aws_batch_JD_memory: ${{secrets.TF_VAR_AWS_BATCH_JD_MEMORY}}
-      TF_VAR_aws_ecr_repo_name: ${{secrets.TF_VAR_AWS_ECR_REPO_NAME}}
-      TF_VAR_batch_job_schedule_expression: ${{secrets.TF_VAR_BATCH_JOB_SCHEDULE_EXPRESSION}}
-      TF_VAR_eventbridge_rule_name: ${{secrets.TF_VAR_EVENTBRIDGE_RULE_NAME}}
-      S3_BUCKET_REGION: ${{ secrets.S3_BUCKET_REGION}}
-
     steps:
-      # Checkout the repository to the GitHub Actions runner
-      - name: Checkout
-        uses: actions/checkout@v3
 
-        # Install the latest version of Terraform CLI and configure the Terraform CLI configuration.
-      - name: Install Terraform
-        run: |
-          echo $environment
-      #     wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
-      #     echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-      #     sudo apt update && sudo apt install terraform
-
-      # # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-      # - name: Terraform Init
-      #   run: |
-      #     cd terraform_code
-      #     terraform init -input=false -force-copy -backend-config="bucket=demoyttesttrail" -backend-config="key=$TF_VAR_EPICC_FOLDER_KEY/tf-state/${GITHUB_REF_NAME}/terraform.tfstate" -backend-config="region=$S3_BUCKET_REGION"
-
-      # # Generates an execution plan for Terraform
-      # - name: Terraform Plan
-      #   run: |
-      #     cd terraform_code
-      #     terraform plan -input=false
-
-      #   # On push to "main", build or change infrastructure according to Terraform configuration files
-      #   # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-      # - name: Terraform Apply
-      #   run: |
-      #     cd terraform_code
-      #     terraform apply -auto-approve -input=false
-
-      #   #Capturing the output from TF
-      # - name: Capturing ECS_TASK_EXECUTION_ROLE , Job_Role & Job Name
-      #   run: |
-      #     cd terraform_code
-      #     echo $(terraform output ECS_TASK_EXECUTION_ROLE)
-      #     echo "EXECUTION_ROLE_ARN=$(terraform output ECS_TASK_EXECUTION_ROLE)" >> $GITHUB_ENV
-      #     echo "JOB_ROLE_ARN=$(terraform output ECS_TASK_EXECUTION_ROLE)" >> $GITHUB_ENV
-      #     echo $(terraform output AWS_BATCH_JOB_NAME)
-      #     aws_batch_job_name=$(terraform output AWS_BATCH_JOB_NAME | tr -d '"')
-      #     ecr_repo_name=$(terraform output ECR_REPO_NAME | tr -d '"')
-      #     echo "JOB_NAME=${aws_batch_job_name}" >> $GITHUB_ENV
-      #     echo "ECR_REPO_NAME=${ecr_repo_name}" >> $GITHUB_ENV
-      #     aws_batch_JD_vcpu_processed=$(terraform output aws_batch_JD_vcpu | tr -d '"')
-      #     echo "AWS_BATCH_JD_VCPU=${aws_batch_JD_vcpu_processed}" >> $GITHUB_ENV
-      #     aws_batch_JD_memory_processed=$(terraform output aws_batch_JD_memory | tr -d '"')
-      #     echo "AWS_BATCH_JD_MEMOREY=${aws_batch_JD_memory_processed}" >> $GITHUB_ENV
-          
-      #   #Configure AWS Credentials
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{secrets.AWS_DEFAULT_REGION}}
-
-      # - name: Login to Amazon ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v2
-
-      # - name: Push-ECR
-      #   env:
-      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     REPOSITORY: ${{ env.ECR_REPO_NAME }}
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-      #     docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-      #     echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
-
-      # - name: Get current JobDefinition revision
-      #   id: get-current-job-definition
-      #   shell: bash
-      #   run: |
-      #     if [[ ! $(which aws) > /dev/null ]]; then
-      #        apt-get update && apt-get install -y awscli
-      #     fi
-      #     REVISION=$(aws batch describe-job-definitions \
-      #       --job-definition-name $JOB_NAME  \
-      #       --status ACTIVE \
-      #       --query "jobDefinitions[0].revision")
-
-      #     echo "revision=$REVISION" >> $GITHUB_ENV
-
-      # - name: Register new JobDefinition
-      #   id: register-new-job-definition
-      #   env:
-      #     ECR_IMAGE_NAME: ${{ env.image }}
-      #     EXECUTION_ROLE_ARN: ${{ env.EXECUTION_ROLE_ARN }}
-      #   shell: bash
-      #   run: |
-      #     echo "ECR Image Name:  $ECR_IMAGE_NAME"
-      #     echo "Job Role ARN: $JOB_ROLE_ARN"
-      #     NEW_REVISION=$(aws batch register-job-definition \
-      #                   --job-definition-name $JOB_NAME \
-      #                   --type container \
-      #                   --parameters '{"p": "None"}' \
-      #                   --retry-strategy '{"attempts": 1,"evaluateOnExit": []}' \
-      #                   --container-properties "{\"image\" :\"$ECR_IMAGE_NAME\", 
-      #                                 \"resourceRequirements\": [{\"value\": \"$AWS_BATCH_JD_VCPU\",\"type\": \"VCPU\"},{\"value\": \"$AWS_BATCH_JD_MEMOREY\",\"type\": \"MEMORY\"}], 
-      #                                 \"volumes\":[], 
-      #                                 \"environment\": [{\"name\": \"env_var\",\"value\": \"Prod\"}], 
-      #                                 \"mountPoints\": [], 
-      #                                 \"ulimits\": [], 
-      #                                 \"user\": \"root\", 
-      #                                 \"jobRoleArn\" : $JOB_ROLE_ARN, 
-      #                                 \"executionRoleArn\": $EXECUTION_ROLE_ARN, 
-      #                                 \"command\": [\"python\",\"app.py\"], 
-      #                                 \"logConfiguration\": {\"logDriver\": \"awslogs\",\"options\": {},\"secretOptions\": []}, 
-      #                                 \"secrets\": [], 
-      #                                 \"networkConfiguration\": {\"assignPublicIp\": \"ENABLED\"},
-      #                                 \"fargatePlatformConfiguration\": {\"platformVersion\": \"LATEST\"}, 
-      #                                 \"runtimePlatform\": {\"operatingSystemFamily\": \"LINUX\",\"cpuArchitecture\": \"X86_64\"}}" \
-      #                   --platform-capabilities FARGATE \
-      #                   --timeout '{"attemptDurationSeconds": 2400}' \
-      #                   --tags '{"epi:environment": "Prod","epi:product_stream": "coding","Department": "PET","epi:supported_by": "PET","epi:owner": "satadru1998@gmail.com","epi:team": "PET","Cost_Center_Name": "MCC_Ops_Tech_Licenses","Name": "Test Job Def"}' \
-      #                   --propagate-tags \
-      #                   --query "revision" )
-      #     echo "new_revision=$NEW_REVISION" >> $GITHUB_ENV     
-
-      # - name: Delete Previous Job Definition
-      #   shell: bash
-      #   env:
-      #     CURRENT_REVISION: ${{ env.revision }}
-      #   run: |
-      #     OLD_JOB_DEFINITION=arn:aws:batch:$AWS_DEFAULT_REGION:825865577047:job-definition/$JOB_NAME:$CURRENT_REVISION
-      #     aws batch deregister-job-definition --job-definition $OLD_JOB_DEFINITION
-      #     PREVIOUS_TO_PREVIOUS_JOB_DEFINITION=arn:aws:batch:$AWS_DEFAULT_REGION:825865577047:job-definition/$JOB_NAME:$((CURRENT_REVISION-1 ))
-      #     aws batch deregister-job-definition --job-definition $PREVIOUS_TO_PREVIOUS_JOB_DEFINITION
-      #     : # cd terraform_code
-      #     : # terraform destroy -auto-approve
-      
-          
+    - name: Display Environment Variables
+      run: |
+        echo "Environment variable value: $environment"

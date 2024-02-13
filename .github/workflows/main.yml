@@ -16,7 +16,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID : ${{secrets.AWS_ACCESS_KEY_ID}}
       AWS_SECRET_ACCESS_KEY : ${{secrets.AWS_SECRET_ACCESS_KEY}}
-      AWS-REGION : ${{secrets.AWS_DEFAULT_REGION}}
+      AWS_DEFAULT_REGION : ${{secrets.AWS_DEFAULT_REGION}}
       TF_VAR_AWS_DEFAULT_REGION : ${{secrets.TF_VAR_AWS_DEFAULT_REGION}}
       TF_VAR_batch_compute_env_name : ${{secrets.TF_VAR_BATCH_COMPUTE_ENV_NAME}}
       TF_VAR_aws_batch_ecs_task_execution_policy_list : ${{secrets.TF_VAR_AWS_BATCH_ECS_TASK_EXECUTION_POLICY_LIST}}
@@ -83,6 +83,10 @@ jobs:
         #Configure AWS Credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{secrets.AWS_DEFAULT_REGION}}
 
       - name: Login to Amazon ECR
         id: login-ecr

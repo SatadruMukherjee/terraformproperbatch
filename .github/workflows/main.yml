@@ -32,6 +32,7 @@ jobs:
       TF_VAR_batch_job_schedule_expression: ${{secrets.TF_VAR_BATCH_JOB_SCHEDULE_EXPRESSION}}
       TF_VAR_eventbridge_rule_name: ${{secrets.TF_VAR_EVENTBRIDGE_RULE_NAME}}
       S3_BUCKET_REGION: ${{ secrets.S3_BUCKET_REGION}}
+      TF_VAR_AWS_S3_BUCKET: ${{secrets.AWS_S3_BUCKET}}
 
     steps:
       # Checkout the repository to the GitHub Actions runner
@@ -50,7 +51,7 @@ jobs:
       - name: Terraform Init
         run: |
           cd terraform_code
-          terraform init -input=false -force-copy -backend-config="bucket=demoyttesttrail" -backend-config="key=$TF_VAR_s3_FOLDER_KEY/tf-state/${GITHUB_REF_NAME}/terraform.tfstate" -backend-config="region=$S3_BUCKET_REGION"
+          terraform init -input=false -force-copy -backend-config="bucket=$TF_VAR_AWS_S3_BUCKET" -backend-config="key=$TF_VAR_s3_FOLDER_KEY/tf-state/${GITHUB_REF_NAME}/terraform.tfstate" -backend-config="region=$S3_BUCKET_REGION"
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
